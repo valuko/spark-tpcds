@@ -62,7 +62,7 @@ check_compile() {
 }
 
 check_gendata() {
- num_datafiles=`find $TPCDS_GENDATA_DIR -name *.dat | wc -l`
+ num_datafiles=`find $TPCDS_GENDATA_LOCAL_DIR -name *.dat | wc -l`
  if [ "$num_datafiles" -lt 24 ]; then 
   logError "TPC-DS data files have not been generated. Please complete option 2"
   echo     "before continuing with the currently selected option."
@@ -87,8 +87,9 @@ check_createtables() {
   fi
   
   cd $SPARK_HOME
-  DRIVER_OPTIONS="--driver-memory 4g --driver-java-options -Dlog4j.configuration=file:///${output_dir}/log4j.properties"
-  EXECUTOR_OPTIONS="--executor-memory 2g --conf spark.executor.extraJavaOptions=-Dlog4j.configuration=file:///${output_dir}/log4j.properties"
+  DRIVER_OPTIONS="--driver-memory 3G --driver-java-options -Dlog4j.configuration=file:///${output_dir}/log4j.properties"
+  EXECUTOR_OPTIONS="--executor-memory 4G --num-executors 60 --conf spark.executor.extraJavaOptions=-Dlog4j.configuration=file:///${output_dir}/log4j.properties"
+
   logInfo "Checking pre-reqs for running TPC-DS queries. May take a few seconds.."
   bin/spark-sql ${DRIVER_OPTIONS} ${EXECUTOR_OPTIONS} --conf spark.sql.catalogImplementation=hive -f ${TPCDS_WORK_DIR}/row_counts.sql > ${TPCDS_WORK_DIR}/rowcounts.out 2>&1
   cat ${TPCDS_WORK_DIR}/rowcounts.out | grep -v "Time" | grep -v "SLF4J" >> ${TPCDS_WORK_DIR}/rowcounts.rrn
@@ -145,6 +146,7 @@ set_environment() {
   fi  
   if [ -z "$TPCDS_GENDATA_DIR" ]; then
      TPCDS_GENDATA_DIR=${TPCDS_ROOT_DIR}/gendata
+     TPCDS_GENDATA_LOCAL_DIR=${TPCDS_ROOT_DIR}/gendata
   fi  
   if [ -z "$TPCDS_GEN_QUERIES_DIR" ]; then
      TPCDS_GENQUERIES_DIR=${TPCDS_ROOT_DIR}/genqueries
@@ -296,7 +298,7 @@ function run_tpcds_common {
   output_dir=$TPCDS_WORK_DIR
   cp ${TPCDS_GENQUERIES_DIR}/*.sql $TPCDS_WORK_DIR
 
-  ${TPCDS_ROOT_DIR}/bin/runqueries.sh $SPARK_HOME $TPCDS_WORK_DIR  > ${TPCDS_WORK_DIR}/runqueries.out 2>&1 &
+  ${TPCDS_ROOT_DIR}/bin/runqueries.sh $SPARK_HOME $TPCDS_WORK_DIR $TPCDS_DBNAME >> ${TPCDS_WORK_DIR}/runqueries.out 2>&1 &
   script_pid=$!
   trap 'handle_shutdown $$ $output_dir; exit' SIGHUP SIGQUIT SIGINT SIGTERM
   cont=1
@@ -417,8 +419,8 @@ function create_spark_tables {
   if [ "$result" -ne 1 ]; then 
     current_dir=`pwd`
     cd $SPARK_HOME
-    DRIVER_OPTIONS="--driver-java-options -Dlog4j.configuration=file:///${output_dir}/log4j.properties"
-    EXECUTOR_OPTIONS="--conf spark.executor.extraJavaOptions=-Dlog4j.configuration=file:///${output_dir}/log4j.properties"
+    DRIVER_OPTIONS="--driver-memory 3G --driver-java-options -Dlog4j.configuration=file:///${output_dir}/log4j.properties"
+    EXECUTOR_OPTIONS="--executor-memory 4G --num-executors 60 --conf spark.executor.extraJavaOptions=-Dlog4j.configuration=file:///${output_dir}/log4j.properties"
     logInfo "Creating tables. Will take a few minutes ..."
     ProgressBar 2 122
     bin/spark-sql ${DRIVER_OPTIONS} ${EXECUTOR_OPTIONS} --conf spark.sql.catalogImplementation=hive -f ${TPCDS_WORK_DIR}/create_database.sql > ${TPCDS_WORK_DIR}/create_database.out 2>&1
@@ -478,7 +480,7 @@ TPC-DS On Spark Menu
 ----------------------------------------------
 SETUP
 (1) Compile TPC-DS toolkit
-(2) Generate TPC-DS data with 1GB scale
+(2) Generate TPC-DS data with 300GB scale
 (3) Create spark tables
 (4) Generate TPC-DS queries
 RUN
@@ -494,7 +496,7 @@ EOF
       printf "%s\n\n" "----------------------------------------------"
       case "$option" in
       "1")  download_and_build ;;
-      "2")  gen_data $TPCDS_ROOT_DIR '1G' ;;
+      "2")  gen_data $TPCDS_ROOT_DIR '300G' ;;
       "3")  create_spark_tables ;;
       "4")  generate_queries ;;
       "5")  run_subset_tpcds_queries ;;

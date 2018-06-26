@@ -32,17 +32,14 @@
 -- 
 -- Contributors:
 -- 
--- RRC 12 April 2016
---             1. MQM to change + days syntax with date_add function . Permitted by Sec 4.2.3.4 f/1
---             2. MQM to modify alias . Permitted by Sec 4.2.3.4 e/1
 
-Define IMID  = random(1,1000,uniform);
-Define YEAR  = random(1998,2002,uniform);
-Define WSDATE = date([YEAR]+"-01-01",[YEAR]+"-04-01",sales);
+define IMID  = random(1,1000,uniform);
+define YEAR  = random(1998,2002,uniform);
+define WSDATE = date([YEAR]+"-01-01",[YEAR]+"-04-01",sales);
 define _LIMIT=100;
 
 [_LIMITA] select [_LIMITB] 
-   sum(ws_ext_discount_amt)  as Excess_Discount_Amount 
+   sum(ws_ext_discount_amt)  as "Excess Discount Amount" 
 from 
     web_sales 
    ,item 
@@ -51,7 +48,7 @@ where
 i_manufact_id = [IMID]
 and i_item_sk = ws_item_sk 
 and d_date between '[WSDATE]' and 
-        date_add(cast('[WSDATE]' as date), 90 )
+        (cast('[WSDATE]' as date) + 90 days)
 and d_date_sk = ws_sold_date_sk 
 and ws_ext_discount_amt  
      > ( 
@@ -63,7 +60,7 @@ and ws_ext_discount_amt
          WHERE 
               ws_item_sk = i_item_sk 
           and d_date between '[WSDATE]' and
-                             date_add(cast('[WSDATE]' as date), 90 )
+                             (cast('[WSDATE]' as date) + 90 days)
           and d_date_sk = ws_sold_date_sk 
       ) 
 order by sum(ws_ext_discount_amt)

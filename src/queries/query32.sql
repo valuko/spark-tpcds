@@ -1,14 +1,14 @@
--- start query 32 in stream 0 using template query32.tpl and seed QUALIFICATION
-select  sum(cs_ext_discount_amt)  as excess_discount_amount
+-- start query 1 in stream 0 using template query32.tpl and seed 2031708268
+select  sum(cs_ext_discount_amt)  as `excess discount amount`
 from 
    catalog_sales 
    ,item 
    ,date_dim
 where
-i_manufact_id = 977
+i_manufact_id = 269
 and i_item_sk = cs_item_sk 
-and d_date between '2000-01-27' and 
-        date_add(cast('2000-01-27' as date), 90 )
+and d_date between '1998-03-18' and 
+        (cast('1998-03-18' as date) + interval '90' days)
 and d_date_sk = cs_sold_date_sk 
 and cs_ext_discount_amt  
      > ( 
@@ -19,9 +19,10 @@ and cs_ext_discount_amt
            ,date_dim
          where 
               cs_item_sk = i_item_sk 
-          and d_date between '2000-01-27' and
-                             date_add(cast('2000-01-27' as date), 90 )
+          and d_date between '1998-03-18' and
+                             (cast('1998-03-18' as date) + interval '90' days)
           and d_date_sk = cs_sold_date_sk 
       ) 
- limit 100;
--- end query 32 in stream 0 using template query32.tpl
+limit 100;
+
+-- end query 1 in stream 0 using template query32.tpl

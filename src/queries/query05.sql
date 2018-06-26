@@ -1,5 +1,5 @@
--- start query 5 in stream 0 using template query5.tpl and seed QUALIFICATION
- with ssr as
+-- start query 1 in stream 0 using template query5.tpl and seed 1819994127
+with ssr as
  (select s_store_id,
         sum(sales_price) as sales,
         sum(profit) as profit,
@@ -25,8 +25,8 @@
      date_dim,
      store
  where date_sk = d_date_sk
-       and d_date between cast('2000-08-23' as date) 
-                  and date_add(cast('2000-08-23' as date), 14 )
+       and d_date between cast('1998-08-04' as date) 
+                  and (cast('1998-08-04' as date) +  interval '14' days)
        and store_sk = s_store_sk
  group by s_store_id)
  ,
@@ -56,8 +56,8 @@
      date_dim,
      catalog_page
  where date_sk = d_date_sk
-       and d_date between cast('2000-08-23' as date)
-                  and date_add(cast('2000-08-23' as date), 14 )
+       and d_date between cast('1998-08-04' as date)
+                  and (cast('1998-08-04' as date) +  interval '14' days)
        and page_sk = cp_catalog_page_sk
  group by cp_catalog_page_id)
  ,
@@ -89,8 +89,8 @@
      date_dim,
      web_site
  where date_sk = d_date_sk
-       and d_date between cast('2000-08-23' as date)
-                  and date_add(cast('2000-08-23' as date), 14 )
+       and d_date between cast('1998-08-04' as date)
+                  and (cast('1998-08-04' as date) +  interval '14' days)
        and wsr_web_site_sk = web_site_sk
  group by web_site_id)
   select  channel
@@ -100,21 +100,21 @@
         , sum(profit) as profit
  from 
  (select 'store channel' as channel
-        , concat('store', s_store_id) as id
+        , 'store' || s_store_id as id
         , sales
         , returns
         , (profit - profit_loss) as profit
  from   ssr
  union all
  select 'catalog channel' as channel
-        , concat('catalog_page', cp_catalog_page_id) as id
+        , 'catalog_page' || cp_catalog_page_id as id
         , sales
         , returns
         , (profit - profit_loss) as profit
  from  csr
  union all
  select 'web channel' as channel
-        , concat('web_site', web_site_id) as id
+        , 'web_site' || web_site_id as id
         , sales
         , returns
         , (profit - profit_loss) as profit
@@ -123,5 +123,6 @@
  group by rollup (channel, id)
  order by channel
          ,id
-  limit 100;
--- end query 5 in stream 0 using template query5.tpl
+ limit 100;
+
+-- end query 1 in stream 0 using template query5.tpl

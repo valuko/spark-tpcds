@@ -1,5 +1,6 @@
 -- start query 49 in stream 0 using template query49.tpl and seed QUALIFICATION
-  select  
+  select  channel, item, return_ratio, return_rank, currency_rank from
+ (select
  'web' as channel
  ,web.item
  ,web.return_ratio
@@ -121,6 +122,7 @@
  or 
  store.currency_rank <= 10
  )
- order by 1,4,5
+ )
+ order by 1,4,5,2
   limit 100;
 -- end query 49 in stream 0 using template query49.tpl

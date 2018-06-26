@@ -1,2 +1,2 @@
 CREATE DATABASE IF NOT EXISTS ${TPCDS_DBNAME}
-  COMMENT 'For TPCDS at 1GB scale factor';
+  COMMENT 'For TPCDS at 300GB scale factor';

@@ -32,8 +32,6 @@
 -- 
 -- Contributors:
 -- 
--- RRC 12 April 2016
---        1. MQM to change + days syntax with date_add function . Permitted by Sec 4.2.3.4 f/1
  define YEAR=random(1998,2002,uniform);
  define SALES_DATE=date([YEAR]+"-01-31",[YEAR]+"-7-01",sales);
  define _LIMIT=100;
@@ -57,8 +55,8 @@
  and i_item_sk          = cs_item_sk
  and cs_warehouse_sk    = w_warehouse_sk 
  and cs_sold_date_sk    = d_date_sk
- and d_date between date_sub(cast ('[SALES_DATE]' as date), 30 )
-                and date_add(cast ('[SALES_DATE]' as date), 30 ) 
+ and d_date between (cast ('[SALES_DATE]' as date) - 30 days)
+                and (cast ('[SALES_DATE]' as date) + 30 days) 
  group by
     w_state,i_item_id
  order by w_state,i_item_id

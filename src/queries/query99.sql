@@ -1,16 +1,16 @@
--- start query 99 in stream 0 using template query99.tpl and seed QUALIFICATION
- select  
-   substr(w_warehouse_name,1,20)
+-- start query 1 in stream 0 using template query99.tpl and seed 1819994127
+select  
+   substr(w_warehouse_name,1,20) ss
   ,sm_type
   ,cc_name
-  ,sum(case when (cs_ship_date_sk - cs_sold_date_sk <= 30 ) then 1 else 0 end)  as 30_days 
+  ,sum(case when (cs_ship_date_sk - cs_sold_date_sk <= 30 ) then 1 else 0 end)  as `30 days`
   ,sum(case when (cs_ship_date_sk - cs_sold_date_sk > 30) and 
-                 (cs_ship_date_sk - cs_sold_date_sk <= 60) then 1 else 0 end )  as 31_60_days
+                 (cs_ship_date_sk - cs_sold_date_sk <= 60) then 1 else 0 end )  as `31-60 days` 
   ,sum(case when (cs_ship_date_sk - cs_sold_date_sk > 60) and 
-                 (cs_ship_date_sk - cs_sold_date_sk <= 90) then 1 else 0 end)  as 61_90_days
+                 (cs_ship_date_sk - cs_sold_date_sk <= 90) then 1 else 0 end)  as `61-90 days`
   ,sum(case when (cs_ship_date_sk - cs_sold_date_sk > 90) and
-                 (cs_ship_date_sk - cs_sold_date_sk <= 120) then 1 else 0 end)  as 91_120_days
-  ,sum(case when (cs_ship_date_sk - cs_sold_date_sk  > 120) then 1 else 0 end)  as above120_days
+                 (cs_ship_date_sk - cs_sold_date_sk <= 120) then 1 else 0 end)  as `91-120 days` 
+  ,sum(case when (cs_ship_date_sk - cs_sold_date_sk  > 120) then 1 else 0 end)  as `>120 days` 
 from
    catalog_sales
   ,warehouse
@@ -18,7 +18,7 @@ from
   ,call_center
   ,date_dim
 where
-    d_month_seq between 1200 and 1200 + 11
+    d_month_seq between 1212 and 1212 + 11
 and cs_ship_date_sk   = d_date_sk
 and cs_warehouse_sk   = w_warehouse_sk
 and cs_ship_mode_sk   = sm_ship_mode_sk
@@ -27,8 +27,9 @@ group by
    substr(w_warehouse_name,1,20)
   ,sm_type
   ,cc_name
-order by substr(w_warehouse_name,1,20)
+order by ss
         ,sm_type
         ,cc_name
- limit 100;
--- end query 99 in stream 0 using template query99.tpl
+limit 100;
+
+-- end query 1 in stream 0 using template query99.tpl

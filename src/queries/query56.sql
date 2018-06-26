@@ -62,6 +62,7 @@ where i_color in ('slate','blanched','burnished'))
         union all
         select * from ws) tmp1
  group by i_item_id
- order by total_sales
+ order by total_sales,
+          i_item_id
   limit 100;
 -- end query 56 in stream 0 using template query56.tpl

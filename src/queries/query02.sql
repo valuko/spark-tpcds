@@ -1,14 +1,14 @@
--- start query 2 in stream 0 using template query2.tpl and seed QUALIFICATION
- with wscs as
+-- start query 1 in stream 0 using template query2.tpl and seed 1819994127
+with wscs as
  (select sold_date_sk
         ,sales_price
-  from  (select ws_sold_date_sk sold_date_sk
+  from (select ws_sold_date_sk sold_date_sk
               ,ws_ext_sales_price sales_price
-        from web_sales 
+        from web_sales) x
         union all
-        select cs_sold_date_sk sold_date_sk
+       (select cs_sold_date_sk sold_date_sk
               ,cs_ext_sales_price sales_price
-        from catalog_sales) x ),
+        from catalog_sales)),
  wswscs as 
  (select d_week_seq,
         sum(case when (d_day_name='Sunday') then sales_price else null end) sun_sales,
@@ -56,4 +56,5 @@
         d_year = 2001+1) z
  where d_week_seq1=d_week_seq2-53
  order by d_week_seq1;
--- end query 2 in stream 0 using template query2.tpl
+
+-- end query 1 in stream 0 using template query2.tpl

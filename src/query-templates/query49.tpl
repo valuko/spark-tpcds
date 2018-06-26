@@ -32,13 +32,12 @@
 -- 
 -- Contributors:
 -- 
--- RRC 12 April 2016
---            1. MQM to change cast function DEC to DECIMAL . Permitted by Sec 4.2.3.4 f/9
  define YEAR=random(1998,2002,uniform);
  define MONTH=random(11,12,uniform);
  define _LIMIT=100;
  
- [_LIMITA] select [_LIMITB] 
+ [_LIMITA] select [_LIMITB] channel, item, return_ratio, return_rank, currency_rank from
+ (select
  'web' as channel
  ,web.item
  ,web.return_ratio
@@ -160,7 +159,6 @@
  or 
  store.currency_rank <= 10
  )
- order by 1,4,5
+ )
+ order by 1,4,5,2
  [_LIMITC];
- 
-

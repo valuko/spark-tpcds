@@ -1,5 +1,5 @@
--- start query 50 in stream 0 using template query50.tpl and seed QUALIFICATION
- select  
+-- start query 1 in stream 0 using template query50.tpl and seed 1819994127
+select 
    s_store_name
   ,s_company_id
   ,s_street_number
@@ -10,14 +10,14 @@
   ,s_county
   ,s_state
   ,s_zip
-  ,sum(case when (sr_returned_date_sk - ss_sold_date_sk <= 30 ) then 1 else 0 end)  as 30_days 
+  ,sum(case when (sr_returned_date_sk - ss_sold_date_sk <= 30 ) then 1 else 0 end)  as `30 days`
   ,sum(case when (sr_returned_date_sk - ss_sold_date_sk > 30) and 
-                 (sr_returned_date_sk - ss_sold_date_sk <= 60) then 1 else 0 end )  as 31_60_days 
+                 (sr_returned_date_sk - ss_sold_date_sk <= 60) then 1 else 0 end )  as `31-60 days` 
   ,sum(case when (sr_returned_date_sk - ss_sold_date_sk > 60) and 
-                 (sr_returned_date_sk - ss_sold_date_sk <= 90) then 1 else 0 end)  as 61_90_days 
+                 (sr_returned_date_sk - ss_sold_date_sk <= 90) then 1 else 0 end)  as `61-90 days`
   ,sum(case when (sr_returned_date_sk - ss_sold_date_sk > 90) and
-                 (sr_returned_date_sk - ss_sold_date_sk <= 120) then 1 else 0 end)  as 91_120_days
-  ,sum(case when (sr_returned_date_sk - ss_sold_date_sk  > 120) then 1 else 0 end)  as above120_days
+                 (sr_returned_date_sk - ss_sold_date_sk <= 120) then 1 else 0 end)  as `91-120 days` 
+  ,sum(case when (sr_returned_date_sk - ss_sold_date_sk  > 120) then 1 else 0 end)  as `>120 days` 
 from
    store_sales
   ,store_returns
@@ -25,8 +25,8 @@ from
   ,date_dim d1
   ,date_dim d2
 where
-    d2.d_year = 2001
-and d2.d_moy  = 8
+    d2.d_year = 2000
+and d2.d_moy  = 9
 and ss_ticket_number = sr_ticket_number
 and ss_item_sk = sr_item_sk
 and ss_sold_date_sk   = d1.d_date_sk
@@ -54,5 +54,6 @@ order by s_store_name
         ,s_county
         ,s_state
         ,s_zip
- limit 100;
--- end query 50 in stream 0 using template query50.tpl
+limit 100;
+
+-- end query 1 in stream 0 using template query50.tpl
